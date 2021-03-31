@@ -1,4 +1,4 @@
-#! /usr/bin/envoc python
+#! /usr/bin/python
 import argparse
 import os
 import openpyxl
@@ -92,7 +92,7 @@ def parse_rows(data):  # given a list of strings, parses each string to normaliz
 
 def parse_words(name):
     words = name.split()
-    words = [word for word in words if len(word) > 2 or word.isupper()]
+    words = [word for word in words if len(word) > 2 or word.isupper() or 'Guest' in word]
     for word in words:
         word.capitalize()
     return ' '.join(words)
