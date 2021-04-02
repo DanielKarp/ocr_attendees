@@ -90,12 +90,27 @@ def parse_rows(data):  # given a list of strings, parses each string to normaliz
     return rows
 
 
-def parse_words(name):
-    words = name.split()
-    words = [word for word in words if len(word) > 2 or word.isupper() or 'Guest' in word]
+def parse_words(name):  # the whole name is passed in and each word processed separately
+    filter_out = ['Guest', 'Desk', 'Pro', 'DX80', 'Participants', ]  # add strings here and they will be filtered out
+    words = name.split()  # turn the name string into list of words
+    new_words = []
+    num_words = len(words)  # things are handled differently depending on how many words there are in the name
+
     for word in words:
-        word.capitalize()
-    return ' '.join(words)
+        if '@' not in word or '.' not in word:  # check if it looks like an email
+            word = ''.join([char for char in word if char.isalnum() or char in '-_'])  # strip out non-alphanum or -_
+        else:  # if it looks like an email, don't process it
+            new_words.append(word)
+            continue
+        if len(word) > 2:  # if a word and does not contain any of the filtered words, capitalize and add back to list
+            if not (any(f in word for f in filter_out)):
+                new_words.append(word.capitalize())
+        elif len(word) == 2 and not(word.islower()) and num_words <= 2:
+            new_words.append(word)  # handle 2-letter initials, but only if there are 2 or less words, otherwise ignore
+            # this is because an initial in a 3-word name is usually caused by the initials in the thumbnail being read
+        # a 1-letter "word" is ignored
+
+    return ' '.join(new_words)  # put all the words back together
 
 
 def write_excel(data, output):  # write the list of tuples to excel, and add formulas for the totals
