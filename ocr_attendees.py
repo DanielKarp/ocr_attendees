@@ -4,9 +4,9 @@ import os
 import openpyxl
 import pytesseract
 
-# if the inputs files are not provided,all files matching one of the allowed patterns will be used
+# all files matching one of the allowed patterns will be used
 # unless they match one of the ignored patterns
-ALLOWED_FILE_EXTENSIONS = ['.png', '.PNG']
+ALLOWED_FILE_EXTENSIONS = ['.png', '.PNG', '.jpg']
 IGNORE_LIST = []
 
 # change this string to the location of the tesseract install if it is not in the PATH
@@ -16,8 +16,10 @@ pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tessera
 def get_args():  # all the argparse flags and help page setup
     parser = argparse.ArgumentParser(description='Use OCR to get Excel from webex meeting participant list screenshot. '
                                                  'It is recommended to take screenshots as cropped as possible in order'
-                                                 ' to avoid interference from other UI elements.',
-                                     epilog=f'Written by Daniel Karpelevitch')
+                                                 ' to avoid interference from other UI elements. Do not include the'
+                                                 ' icons on the right or the thumbnails on the left of the participant'
+                                                 ' list, and expand the participant list so no words are cut off.',
+                                     epilog=f'Written by Daniel Karpelevitch (dkarpele@cisco.com)')
     parser.add_argument('inputs', type=str, nargs='*',
                         help='files and directories to get data from - leave blank to use all .png files in current '
                              'directory\nif directories are specified, all .png files in those directories that match '
@@ -27,14 +29,14 @@ def get_args():  # all the argparse flags and help page setup
     return parser.parse_args()
 
 
-def get_files(inputs):
-    if not inputs:
+def get_files(inputs):  # gather the files based on provided input or if no input, all matching files in current dir
+    if not inputs:  # inputs is a list of file names and directories
         return [file for file in os.listdir(os.curdir)
                 if any(ext in file for ext in ALLOWED_FILE_EXTENSIONS)
                 and not any(ign in file for ign in IGNORE_LIST)]
     files = []
-    for item in inputs:
-        if os.path.isdir(item):
+    for item in inputs:  # iterate through each item in the inputs list
+        if os.path.isdir(item):  # if the item is a directory, add all matching files in that directory to files list
             files.extend([os.path.join(item, file) for file in os.listdir(item)
                           if any(ext in file for ext in ALLOWED_FILE_EXTENSIONS)
                           and not any(ign in file for ign in IGNORE_LIST)])
@@ -50,7 +52,7 @@ def get_data(files):  # does ocr on each file and adds it to one big string, the
         print(file)
         data += pytesseract.image_to_string(file, lang='eng')
 
-    return [x for x in data.split('\n') if x not in ['', ' ', '\n', 'Cohost', 'Host', 'Me', chr(12), 'x']]
+    return [x for x in data.split('\n') if x not in ['', ' ', '\n', 'Cohost', 'Host', 'Me', chr(12), 'x', 'Q_ Search']]
 
 
 def parse_rows(data):  # given a list of strings, parses each string to normalize all the data and filter out edge cases
@@ -124,6 +126,7 @@ def write_excel(data, output):  # write the list of tuples to excel, and add for
     for row, (name, attendee_type) in enumerate(data, start=2):
         sheet[f'A{row}'] = name
         sheet[f'B{row}'] = attendee_type
+
     # make the headers for the totals
     sheet['C1'] = 'Total:'
     sheet['C2'] = 'Cisco:'
@@ -138,7 +141,7 @@ def write_excel(data, output):  # write the list of tuples to excel, and add for
     workbook.save(filename=output)
 
 
-def print_result(data):  # print all the data to the console for quick debugging
+def print_result(data):  # print all the data gathered to the console for quick debugging
     print(*[f'{x[0].ljust(30)}{x[1]}' for x in data], sep='\n')
     print('Total:', len(data))
 
@@ -147,10 +150,10 @@ def main():  # the main function :) drives all the others
     args = get_args()
     files = get_files(args.inputs)
     data = get_data(files)
-    data = parse_rows(data)
+    parsed_data = parse_rows(data)
 
-    write_excel(data, args.output)
-    print_result(data)
+    write_excel(parsed_data, args.output)
+    print_result(parsed_data)
 
 
 if __name__ == '__main__':
