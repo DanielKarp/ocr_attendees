@@ -38,10 +38,9 @@ def get_files(inputs):
             files.extend([os.path.join(item, file) for file in os.listdir(item)
                           if any(ext in file for ext in ALLOWED_FILE_EXTENSIONS)
                           and not any(ign in file for ign in IGNORE_LIST)])
-        else:
-            if any([ext in item for ext in ALLOWED_FILE_EXTENSIONS]) and not any([ign in item for ign in IGNORE_LIST]):
-                files.append(item)
-    return files
+        else:  # otherwise, the item is a filename. Add it to the files list
+            files.append(item)
+    return files  # return the files list containing all the files to be used
 
 
 def get_data(files):  # does ocr on each file and adds it to one big string, then splits to a list on each newline and
