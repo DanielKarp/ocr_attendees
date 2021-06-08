@@ -8,6 +8,7 @@ list so no words get cut off.
    1. Download `ocr_gui.zip`
    2. Unzip the folder
    3. Run `ocr_gui.exe` 
+---
 ### ocr_gui.py
 Run this file to be presented with a file dialog to select input files, and another file dialog to save the output file.
 ### ocr_attendees.py
