@@ -29,11 +29,15 @@ def get_args():  # all the argparse flags and help page setup
 def get_files():  # gather the files based on provided input or if no input, all matching files in current dir
     files = []
     Tk().withdraw()
+    print('Select files to process.')
     inputs = askopenfilenames(title="Select file(s)",
                               filetypes=(("png files", "*.png"),
                                          ("jpg files", "*.jpg"),
                                          ("jpeg files", "*.jpeg"),
                                          ("all files", "*.*")))
+    if not inputs:
+        print('File Selection Cancelled')
+        return None
     for item in inputs:  # iterate through each item in the inputs list
         if os.path.isdir(item):  # if the item is a directory, add all matching files in that directory to files list
             files.extend([os.path.join(item, file) for file in os.listdir(item)
@@ -136,12 +140,15 @@ def write_excel(data):  # write the list of tuples to excel, and add formulas fo
     sheet['D2'] = '=COUNTIF(B:B, "Cisco")'
     sheet['D3'] = '=COUNTIF(B:B, "Guest")'
 
+    print('Select output filename.')
     output = asksaveasfilename(defaultextension='.xlsx',
                                filetypes=[("Excel file", '*.xlsx')],
                                title="Choose filename for excel export")
-
-    # save the file with the filename provided
-    workbook.save(filename=output)
+    if not output:
+        print('File Selection Cancelled')
+    else:
+        # save the file with the filename provided
+        workbook.save(filename=output)
 
 
 def print_result(data):  # print all the data gathered to the console for quick debugging
@@ -152,11 +159,12 @@ def print_result(data):  # print all the data gathered to the console for quick 
 def main():  # the main function :) drives all the others
     get_args()
     files = get_files()
-    data = get_data(files)
-    parsed_data = parse_rows(data)
+    if files:
+        data = get_data(files)
+        parsed_data = parse_rows(data)
 
-    print_result(parsed_data)
-    write_excel(parsed_data)
+        print_result(parsed_data)
+        write_excel(parsed_data)
 
 
 if __name__ == '__main__':
