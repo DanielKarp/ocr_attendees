@@ -29,11 +29,11 @@ def get_args():  # all the argparse flags and help page setup
 def get_files():  # gather the files based on provided input or if no input, all matching files in current dir
     files = []
     Tk().withdraw()
-    inputs = askopenfilenames(title = "Select file(s)",
-                              filetypes = (("png files","*.png"),
-                                           ("jpg files","*.jpg"),
-                                           ("jpeg files","*.jpeg"),
-                                           ("all files","*.*")))
+    inputs = askopenfilenames(title="Select file(s)",
+                              filetypes=(("png files", "*.png"),
+                                         ("jpg files", "*.jpg"),
+                                         ("jpeg files", "*.jpeg"),
+                                         ("all files", "*.*")))
     for item in inputs:  # iterate through each item in the inputs list
         if os.path.isdir(item):  # if the item is a directory, add all matching files in that directory to files list
             files.extend([os.path.join(item, file) for file in os.listdir(item)
@@ -105,7 +105,7 @@ def parse_words(name):  # the whole name is passed in and each word processed se
         if len(word) > 2:  # if a word and does not contain any of the filtered words, capitalize and add back to list
             if not (any(f in word for f in filter_out)):
                 new_words.append(word.capitalize())
-        elif len(word) == 2 and not(word.islower()) and num_words <= 2:
+        elif len(word) == 2 and not (word.islower()) and num_words <= 2:
             new_words.append(word)  # handle 2-letter initials, but only if there are 2 or less words, otherwise ignore
             # this is because an initial in a 3-word name is usually caused by the initials in the thumbnail being read
         # a 1-letter "word" is ignored
@@ -155,8 +155,8 @@ def main():  # the main function :) drives all the others
     data = get_data(files)
     parsed_data = parse_rows(data)
 
-    write_excel(parsed_data)
     print_result(parsed_data)
+    write_excel(parsed_data)
 
 
 if __name__ == '__main__':
