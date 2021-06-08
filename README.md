@@ -4,7 +4,7 @@ recommended to take screenshots as cropped as possible in order to avoid
 interference from other UI elements. Do not include the icons on the right or
 the thumbnails on the left of the participant list, and expand the participant
 list so no words get cut off.
-## Easiest installation option
+## The easiest installation method
    1. Download `ocr_gui.zip`
    2. Unzip the folder
    3. Run `ocr_gui.exe` 
