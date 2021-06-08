@@ -13,7 +13,7 @@ ALLOWED_FILE_EXTENSIONS = ['.png', '.PNG', '.jpg']
 IGNORE_LIST = []
 
 # change this string to the location of the tesseract install if it is not in the PATH
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
+pytesseract.pytesseract.tesseract_cmd = r'./Tesseract-OCR/tesseract'
 
 
 def get_args():  # all the argparse flags and help page setup
